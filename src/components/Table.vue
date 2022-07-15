@@ -4,10 +4,17 @@ import { useStore } from '@/stores/qb'
 
 const store = useStore()
 const qbs = computed(() => store.$state.data)
+const searchQuery = ref('')
 
-setTimeout(async () => {
+/* setTimeout(async () => {
     qbs.value
-}, 5000)
+}, 5000) */
+
+const sortedPlayers = computed(() => {
+    return qbs.value.filter(
+        qb => qb.Player.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+})
 </script>
 
 <template>
@@ -39,43 +46,53 @@ setTimeout(async () => {
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank
+                                    </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points 
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">PPG 
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">PPG
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Yards 
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Yards
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">TD 
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">TD
                                     </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Chart
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody  class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr v-for="qb in qbs" :key="qb.ID">
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr v-for="qb in sortedPlayers" :key="qb.ID">
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
                                         {{ qb.Player }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{ qb.RkOv }}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{
+                                            qb.RkOv
+                                    }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{qb.Team}}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{qb.FPts}}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{qb['FP/G']}}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{qb.Yds}}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{qb.TD}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                                        {{ qb.Team }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                                        {{ qb.FPts }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                                        {{ qb['FP/G'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                                        {{ qb.Yds }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                                        {{ qb.TD }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a class="text-blue-500 hover:text-blue-700" href="#">View</a>
+                                        <router-link :to="{ name: 'Quarterback', params: { id: qb.ID } }">
+                                            <a class="text-blue-500 hover:text-blue-700" href="#">View</a>
+                                        </router-link>
                                     </td>
-                                </tr>        
+                                </tr>
                             </tbody>
                         </table>
                     </div>
