@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import Quarterback from '@/components/Quarterback.vue'
-
-import * as qbs from '@/data.json'
+import Player from '@/components/Player.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,9 +19,9 @@ const router = createRouter({
       component: () => import('@/views/AboutView.vue')
     },
     {
-      path: '/quaterback/:id',
-      name: 'Quarterback',
-      component: Quarterback,
+      path: '/player/:id',
+      name: 'Player',
+      component: Player,
       props: true,
     }
   ]

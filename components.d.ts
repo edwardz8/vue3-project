@@ -8,9 +8,11 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     CardGrid: typeof import('./src/components/CardGrid.vue')['default']
+    Player: typeof import('./src/components/Player.vue')['default']
     Quarterback: typeof import('./src/components/Quarterback.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Table: typeof import('./src/components/Table.vue')['default']
+    TeamCardGrid: typeof import('./src/components/TeamCardGrid.vue')['default']
   }
 }

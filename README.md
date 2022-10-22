@@ -37,7 +37,24 @@ you may get warnings. if so, follow this: https://tailwindcss.com/docs/upgrade-g
 
 https://preline.co
 
-npm i preline 
+npm i preline
+
+## Install Prisma 
+
+Inside the root of the project: 
+
+npm install prisma --save-dev
+npx prisma init
+
+with TypeScript and seeding data, may have to include:
+
+npm i -D ts-node
+
+// package.json 
+"prisma": {
+  "seed": "node --loader ts-node/esm prisma/seed.ts"
+}
+
 
 ## Project Setup
 

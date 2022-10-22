@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
-import qb from '@/data.json'
+// import qb from '@/data.json'
+import hockey from '@/hockey.json'
 
 export const useStore = defineStore({
-  id: 'qb',
+  id: 'hockey',
   state: () => ({
-      data: qb
+      data: hockey
   }),
 })

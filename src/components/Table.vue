@@ -1,24 +1,61 @@
 <script setup>
-import { computed } from 'vue';
-import { useStore } from '@/stores/qb'
+import { computed, onMounted, ref } from 'vue';
+// import { useStore } from '@/stores/hockey'
+import hockey from '@/hockey.json'
 
-const store = useStore()
-const qbs = computed(() => store.$state.data)
+// const store = useStore()
+// const players = computed(() => store.$state.data)
+
+/* onMounted(() => {
+    fetch('hockey.json')
+        .then(response => response.json())
+        .then(json => hockey = json);
+})
+ */
+
+const hockeyResults = ref(hockey)
+const count = ref('')
+const perPage = ref(4)
+const page = ref(1)
+const loadingNext = ref(false)
+const loadingPrev = ref(false)
+
+count.value = hockeyResults.value.count
+
+/* pagination */
+const fetchPage = async (p) => {
+    if (p > page.value) loadingNext.value = true
+    else loadingPrev.value = true
+
+    try {
+        fetch('json/hockey.json')
+            .then(response => response.json)
+            .then(json => hockey = json)
+    } catch (err) {
+        console.log(err)
+    } finally {
+        loadingNext.value = false
+        loadingPrev.value = false 
+    }
+}
+
+const showNextPage = computed(() => {
+    return Math.floor(count.value / (page.value * perPage.value))
+})
+
+/* search */
 const searchQuery = ref('')
 
-/* setTimeout(async () => {
-    qbs.value
-}, 5000) */
-
 const sortedPlayers = computed(() => {
-    return qbs.value.filter(
-        qb => qb.Player.toLowerCase().includes(searchQuery.value.toLowerCase())
+    return hockeyResults.value.filter(
+        p => p.Player.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
 })
 </script>
 
 <template>
     <div class="flex flex-col mt-4">
+        <!-- <pre>{{ hockeyResults }}</pre> -->
         <div class="-m-1.5 overflow-x-auto">
             <div class="p-1.5 min-w-full inline-block align-middle">
                 <div class="border rounded-lg divide-y divide-gray-200 dark:border-gray-700 dark:divide-gray-700">
@@ -55,40 +92,40 @@ const sortedPlayers = computed(() => {
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">PPG
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Goals
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Yards
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assists
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">TD
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Shots
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Chart
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">More
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr v-for="qb in sortedPlayers" :key="qb.ID">
+                                <tr v-for="player in sortedPlayers" :key="player.ID">
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
-                                        {{ qb.Player }}</td>
+                                        {{ player.Player }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{
-                                            qb.RkOv
+                                    player.RkOv
                                     }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                                        {{ qb.Team }}</td>
+                                        {{ player.Team }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                                        {{ qb.FPts }}</td>
+                                        {{ player.FPts }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                                        {{ qb['FP/G'] }}</td>
+                                        {{ player.G }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                                        {{ qb.Yds }}</td>
+                                        {{ player.A }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                                        {{ qb.TD }}</td>
+                                        {{ player.SOG }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <router-link :to="{ name: 'Quarterback', params: { id: qb.ID } }">
+                                        <router-link :to="{ name: 'Player', params: { id: player.ID } }">
                                             <a class="text-blue-500 hover:text-blue-700" href="#">View</a>
                                         </router-link>
                                     </td>
@@ -98,18 +135,12 @@ const sortedPlayers = computed(() => {
                     </div>
                     <div class="py-1 px-4">
                         <nav class="flex items-center space-x-2">
-                            <a class="text-gray-400 hover:text-blue-600 p-4 inline-flex items-center gap-2 font-medium rounded-md"
+                            <a :disabled="page === 1" @click="fetchPage(page - 1)" class="text-gray-400 hover:text-blue-600 p-4 inline-flex items-center gap-2 font-medium rounded-md"
                                 href="#">
                                 <span aria-hidden="true">«</span>
                                 <span class="sr-only">Previous</span>
                             </a>
-                            <a class="w-10 h-10 bg-blue-500 text-white p-4 inline-flex items-center text-sm font-medium rounded-full"
-                                href="#" aria-current="page">1</a>
-                            <a class="w-10 h-10 text-gray-400 hover:text-blue-600 p-4 inline-flex items-center text-sm font-medium rounded-full"
-                                href="#">2</a>
-                            <a class="w-10 h-10 text-gray-400 hover:text-blue-600 p-4 inline-flex items-center text-sm font-medium rounded-full"
-                                href="#">3</a>
-                            <a class="text-gray-400 hover:text-blue-600 p-4 inline-flex items-center gap-2 font-medium rounded-md"
+                            <a :disabled="showNextPage === 0" @click="fetchPage(page + 1)" class="text-gray-400 hover:text-blue-600 p-4 inline-flex items-center gap-2 font-medium rounded-md"
                                 href="#">
                                 <span class="sr-only">Next</span>
                                 <span aria-hidden="true">»</span>
